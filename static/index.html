@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Flower AI Pro</title>
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#6c5ce7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2855/2855848.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: white;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 40px 20px 20px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+        }
+        
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        .camera-container {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        #preview {
+            width: 100%;
+            height: 300px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        #preview img, #preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+        }
+        
+        .btn-primary {
+            background: white;
+            color: #6c5ce7;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .results {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            color: #333;
+            border-radius: 20px;
+            padding: 25px;
+            display: none;
+        }
+        
+        .results.show {
+            display: block;
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .result-header {
+            font-size: 1.8rem;
+            color: #6c5ce7;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .stat-box {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #6c5ce7;
+        }
+        
+        .info-section {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #6c5ce7;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        
+        .spinner.show {
+            display: block;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌸 Flower AI Pro</h1>
+        <p>AI-Powered Flower Identification</p>
+    </div>
+    
+    <div class="container">
+        <div class="camera-container">
+            <div id="preview">
+                <div style="text-align: center; opacity: 0.5;">
+                    📷<br>No Image
+                </div>
+            </div>
+            <input type="file" id="fileInput" accept="image/*" capture="environment">
+            <button class="btn btn-primary" id="cameraBtn">📸 Take Photo</button>
+            <button class="btn btn-secondary" id="analyzeBtn" disabled>🔍 Analyze Flower</button>
+            <div class="spinner" id="spinner"></div>
+        </div>
+        
+        <div class="results" id="results">
+            <div class="result-header" id="flowerName">Rose</div>
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-label">Confidence</div>
+                    <div class="stat-value" id="confidence">--</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Freshness</div>
+                    <div class="stat-value" id="lifespan">--</div>
+                </div>
+            </div>
+            <div class="info-section">
+                <div class="info-title">🌱 Care & Condition</div>
+                <div id="care">--</div>
+            </div>
+            <div class="info-section">
+                <div class="info-title">✨ Symbolism</div>
+                <div id="meaning">--</div>
+            </div>
+            <button class="btn btn-primary" onclick="resetApp()">Scan Another</button>
+        </div>
+    </div>
+    
+    <script>
+        let selectedFile = null;
+        const API_URL = `http://${window.location.hostname}:8000/predict`;
+        
+        // Camera button
+        document.getElementById('cameraBtn').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+        
+        // File selection
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                selectedFile = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    document.getElementById('preview').innerHTML = `<img src="${event.target.result}" alt="Selected flower">`;
+                    document.getElementById('analyzeBtn').disabled = false;
+                };
+                reader.readAsDataURL(selectedFile);
+            }
+        });
+        
+        // Analyze button
+        document.getElementById('analyzeBtn').addEventListener('click', async () => {
+            if (!selectedFile) return;
+            
+            // Show spinner
+            document.getElementById('spinner').classList.add('show');
+            document.getElementById('analyzeBtn').disabled = true;
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Display results
+                    document.getElementById('flowerName').textContent = result.flower.charAt(0).toUpperCase() + result.flower.slice(1);
+                    document.getElementById('confidence').textContent = result.confidence + '%';
+                    document.getElementById('lifespan').textContent = result.data.lifespan;
+                    document.getElementById('care').textContent = result.data.care;
+                    document.getElementById('meaning').textContent = result.data.meaning;
+                    
+                    document.getElementById('results').classList.add('show');
+                } else {
+                    alert('Error: ' + result.message);
+                    document.getElementById('analyzeBtn').disabled = false;
+                }
+            } catch (error) {
+                alert('Connection Error: ' + error.message);
+                document.getElementById('analyzeBtn').disabled = false;
+            } finally {
+                document.getElementById('spinner').classList.remove('show');
+            }
+        });
+        
+        function resetApp() {
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('preview').innerHTML = '<div style="text-align: center; opacity: 0.5;">📷<br>No Image</div>';
+            document.getElementById('analyzeBtn').disabled = true;
+            document.getElementById('fileInput').value = '';
+            selectedFile = null;
+        }
+        
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js');
+        }
+    </script>
+</body>
+</html>

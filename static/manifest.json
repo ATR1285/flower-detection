@@ -1,0 +1,21 @@
+{
+    "name": "Flower AI Pro",
+    "short_name": "FlowerAI",
+    "description": "Premium flower identification and lifespan estimation AI.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#f0f2f6",
+    "theme_color": "#6c5ce7",
+    "icons": [
+        {
+            "src": "https://cdn-icons-png.flaticon.com/512/2855/2855848.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "https://cdn-icons-png.flaticon.com/512/2855/2855848.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
